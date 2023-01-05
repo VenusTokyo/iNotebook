@@ -4,7 +4,7 @@ const router = express.Router()
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
-
+const fetchUser =require('../middleware/fetchUser')
 const JWT_SECRET ="harryisagood$boy"
 
 //route 1
@@ -50,7 +50,7 @@ async (req, res) => {
 
   } catch(error){
     console.error(error.message)
-    res.status(500).send("Some Error occured")
+    res.status(500).send("Internal Server Error")
   }
 
 
@@ -96,11 +96,21 @@ async (req, res) => {
 
  }catch (error){
   console.error(error.message)
-  res.status(500).send("Some Error occured") }
+  res.status(500).send("Internal server error") }
 }
 )
 
 //route 3
 //logged in, after logging in, login required
-  
+router.post('/getuser', fetchUser,
+async (req, res) => {
+  try {
+    userId =req.user.id
+    const user =await User.findById(userId).select("-password")
+    res.send(user)
+  } catch (error) {
+    console.error(error.message)
+    res.status(500).send("Internal server error")
+  }
+})
 module.exports = router
