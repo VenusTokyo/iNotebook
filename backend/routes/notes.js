@@ -42,5 +42,18 @@ router.post('/addnote', fetchUser, [
 
         }
     })
+//route no. 3 updating an existing note --login required
+router.put('/updatenote:id', fetchUser, 
+async (req,res)=>{
+    const {title, description, tag}= req.body;
+    //creat newNote obj
+    const newNote ={};
+    if (title){newNote.title=title}
+    if (description){newNote.description=description}
+    if (tag){newNote.tag=tag}
+    
+    //find the note to be updated and update it
+    
+}) 
 
 module.exports = router
