@@ -9,7 +9,7 @@ router.get('/fetchallnotes', fetchUser,
     async (req, res) => {
         try {
 
-            const note= await Note.find({ user: req.user.id })
+            const note = await Note.find({ user: req.user.id })
             res.json(note)
         } catch (error) {
             console.error(error.message)
@@ -43,17 +43,30 @@ router.post('/addnote', fetchUser, [
         }
     })
 //route no. 3 updating an existing note --login required
-router.put('/updatenote:id', fetchUser, 
-async (req,res)=>{
-    const {title, description, tag}= req.body;
-    //creat newNote obj
-    const newNote ={};
-    if (title){newNote.title=title}
-    if (description){newNote.description=description}
-    if (tag){newNote.tag=tag}
-    
-    //find the note to be updated and update it
-    
-}) 
+router.put('/updatenote/:id', fetchUser,
+    async (req, res) => {
+        const { title, description, tag } = req.body;
+        //creat newNote obj
+        const newNote = {};
+        if (title) { newNote.title = title }
+        if (description) { newNote.description = description }
+        if (tag) { newNote.tag = tag }
+
+        //find the note to be updated and update it
+
+        //checking if the note exist
+        let note = await Note.findById(req.params.id)
+        if(!note) { 
+            return res.status(404).send('Not Found') }
+
+        //checking if correct user is accessing it
+        if(toString(note.user) !== req.user.id) {
+            return res.status(401).send('Not Allowed')
+        }
+
+
+        note = await Note.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true })
+        res.json({ note })
+    })
 
 module.exports = router
